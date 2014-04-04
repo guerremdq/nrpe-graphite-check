@@ -7,5 +7,6 @@ Install requests
 
 	pip install requests
 
-ie: 
+Run the script:
+
 	python graphite-check.py  -u http://graphite.foo.com/ -t foo.db.maxConnections.size  -w 40 -c 70
