@@ -14,8 +14,13 @@ options.add_option("-T", "--time", 	dest="time",help="time in minutes", default=
 (options, args) = options.parse_args()
 
 URL=("%s/render/?target=%s&from=-%dminutes&format=json" % ( options.url , options.target , options.time ))
+try:
+	r  = requests.get(URL).json()
 
-r  = requests.get(URL).json()
+except  requests.exceptions.ConnectionError:
+	print "Critial : Connection Error"
+	sys.exit(1)
+
 i = 0
 total = 0
 
