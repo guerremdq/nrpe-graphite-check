@@ -5,34 +5,38 @@ import requests
 
 options = OptionParser()
 options.add_option("-u", "--url", dest="url", help="graphite url",
-                    default="http://graphite.example.com")
+                   default="http://graphite.example.com")
 options.add_option("-c", "--critical", dest="critical", help="critical limit",
-                    default="1024", type="int")
+                   default="1024", type="int")
 options.add_option("-w", "--warning", dest="warning",
-                    help="warning limit", default="800", type="int")
+                   help="warning limit", default="800", type="int")
 options.add_option("-t", "--target", dest="target",
-                    help="graphite target",
-                    default="server.web1.load.load.longterm")
+                   help="graphite target",
+                   default="server.web1.load.load.longterm")
 options.add_option("-T", "--time", dest="time", help="time in minutes",
-                    default="5", type="int")
+                   default="5", type="int")
 (options, args) = options.parse_args()
 URL = ("%s/render/?target=%s&from=-%dminutes&format=json" %
-        (options.url, options.target, options.time))
+      (options.url, options.target, options.time))
 try:
     r = requests.get(URL).json()
-except  requests.exceptions.ConnectionError:
+except requests.exceptions.ConnectionError:
     print ("Critial : Connection Error")
     sys.exit(1)
-i = 0
-total = 0
 
-for x in r:
-    for d in x['datapoints']:
-        if d[0] is not None:
-            total = total + d[0]
-            i = i + 1
 
-avg = total / i
+def get_average(j):
+    total = 0
+    i = 0
+    for x in r:
+        for d in x['datapoints']:
+            if d[0] is not None:
+                total = total + d[0]
+                i = i + 1
+
+    return total / i
+
+avg = get_average(r)
 
 if avg >= options.critical:
     print (("Critical Avg : %d " % avg))
